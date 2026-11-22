@@ -1,0 +1,93 @@
+{
+  "expo": {
+    "name": "expo-widgets-repro",
+    "slug": "expo-widgets-repro",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.widgetrepro"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-widgets",
+        {
+          "widgets": [
+            {
+              "name": "ReproWidget",
+              "displayName": "Repro Widget",
+              "description": "Shows the widget configuration values.",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium"
+                ],
+                "configuration": {
+                  "title": "Repro",
+                  "parameters": {
+                    "theme": {
+                      "title": "Theme",
+                      "type": "enum",
+                      "values": [
+                        {
+                          "name": "Light theme",
+                          "value": "light"
+                        },
+                        {
+                          "name": "Dark theme",
+                          "value": "dark"
+                        }
+                      ],
+                      "default": "light"
+                    },
+                    "desk": {
+                      "title": "Desk",
+                      "type": "enum",
+                      "dynamic": true,
+                      "values": [
+                        {
+                          "name": "Automatic (app.json)",
+                          "value": "auto"
+                        }
+                      ],
+                      "default": "auto"
+                    },
+                    "showDate": {
+                      "title": "Show Date",
+                      "type": "boolean",
+                      "default": true
+                    },
+                    "label": {
+                      "title": "Label",
+                      "type": "string",
+                      "default": "Hello"
+                    },
+                    "count": {
+                      "title": "Count",
+                      "type": "number",
+                      "default": 3
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    ]
+  }
+}
