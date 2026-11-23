@@ -1,6 +1,6 @@
-# expo-widgets Toggle repro (`toggle` branch)
+# expo-widgets Toggle repro (`toggle-fixed` branch)
 
-Expo SDK 58, `expo-widgets` 58.0.29 and `@expo/ui` 58.0.29 with no patches.
+Expo SDK 58, `expo-widgets` 58.0.29 and `@expo/ui` 58.0.29 with the fix applied by patch-package.
 
 The widget in `widgets/ReproWidget.tsx` shows `enabled: <value>`, an `Enabled` `Toggle` from `@expo/ui/swift-ui`, `count: <value>`, and a `Count` `Button`.
 
@@ -16,7 +16,7 @@ Expected: the widget shows the `Enabled` toggle. A tap toggles it, and the widge
 
 Actual: the toggle is not rendered. The widget shows `enabled: false`, then `count: 0` and the `Count` button. The `Count` button works.
 
-The `toggle-fixed` branch applies the fix to `expo-widgets` and `@expo/ui` with patch-package.
+This is the `toggle-fixed` branch. It applies the fix to `expo-widgets` and `@expo/ui` with patch-package (`patches/`). With it, the toggle shows and a tap toggles it.
 
 ---
 

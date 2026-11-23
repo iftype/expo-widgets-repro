@@ -1,0 +1,133 @@
+diff --git a/node_modules/expo-widgets/bundle/decorator.ts b/node_modules/expo-widgets/bundle/decorator.ts
+index 8b82ecd..6eb1a40 100644
+--- a/node_modules/expo-widgets/bundle/decorator.ts
++++ b/node_modules/expo-widgets/bundle/decorator.ts
+@@ -6,6 +6,7 @@ const interactiveTargetTypes = [
+   'OutlinedButton',
+   'ElevatedButton',
+   'TextButton',
++  'ToggleView',
+ ];
+ 
+ export function decorateInteractiveTargets(node: unknown) {
+diff --git a/node_modules/expo-widgets/bundle/index.ts b/node_modules/expo-widgets/bundle/index.ts
+index f063f35..76da786 100644
+--- a/node_modules/expo-widgets/bundle/index.ts
++++ b/node_modules/expo-widgets/bundle/index.ts
+@@ -97,6 +97,8 @@ const __expoWidgetHandlePress = function (
+     const props = node?.props as {
+       onButtonPress?: () => Dictionary;
+       onButtonPressed?: () => Dictionary;
++      onIsOnChange?: (event: { nativeEvent: { isOn: boolean } }) => Dictionary;
++      isOn?: boolean;
+       target?: string;
+       children?: unknown;
+     };
+@@ -105,6 +107,9 @@ const __expoWidgetHandlePress = function (
+     if (onPress && props?.target === target) {
+       return onPress();
+     }
++    if (props?.onIsOnChange && props.target === target) {
++      return props.onIsOnChange({ nativeEvent: { isOn: !props.isOn } });
++    }
+ 
+     for (const child of React.Children.toArray(props?.children)) {
+       const result = findAndCallOnPress(child as Dictionary);
+diff --git a/node_modules/expo-widgets/ios/Widgets/Toggles.swift b/node_modules/expo-widgets/ios/Widgets/Toggles.swift
+new file mode 100644
+index 0000000..b614ef1
+--- /dev/null
++++ b/node_modules/expo-widgets/ios/Widgets/Toggles.swift
+@@ -0,0 +1,62 @@
++import SwiftUI
++import ExpoModulesCore
++import ExpoUI
++
++final class ToggleProps: ExpoUI.ToggleProps {
++  @Field var source: String?
++  @Field var target: String?
++  @Field var entryIndex: Int?
++  @Field var environmentString: String?
++}
++
++@available(iOS 17.0, *)
++struct WidgetToggleView: ExpoSwiftUI.View {
++  @ObservedObject var props: ToggleProps
++
++  var body: some View {
++    SwiftUI.Toggle(
++      isOn: props.isOn ?? false,
++      intent: WidgetUserInteraction(
++        source: props.source,
++        target: props.target,
++        entryIndex: props.entryIndex,
++        environmentString: props.environmentString
++      )
++    ) {
++      if let label = props.label {
++        if let systemImage = props.systemImage {
++          Label(title: { Text(label) }, icon: { Image(systemName: systemImage) })
++        } else {
++          Text(label)
++        }
++      } else {
++        Children()
++      }
++    }
++  }
++}
++
++@available(iOS 17.0, *)
++struct LiveActivityToggleView: ExpoSwiftUI.View {
++  @ObservedObject var props: ToggleProps
++
++  var body: some View {
++    SwiftUI.Toggle(
++      isOn: props.isOn ?? false,
++      intent: LiveActivityUserInteraction(
++        source: props.source,
++        target: props.target
++      )
++    ) {
++      if let label = props.label {
++        if let systemImage = props.systemImage {
++          Label(title: { Text(label) }, icon: { Image(systemName: systemImage) })
++        } else {
++          Text(label)
++        }
++      } else {
++        Children()
++      }
++    }
++  }
++}
+diff --git a/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift b/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift
+index 68e376f..a5d2bd2 100644
+--- a/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift
++++ b/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift
+@@ -77,6 +77,25 @@ struct WidgetsViewRenderer {
+       } else {
+         return renderWithModifiers(ExpoUI.Button.self, ExpoUI.ButtonProps.self, updateProps: updateChildren)
+       }
++    case "ToggleView":
++      if #available(iOS 17.0, *) {
++        switch kind {
++        case .widget:
++          return renderWithModifiers(WidgetToggleView.self, ToggleProps.self) { toggleProps in
++            try updateChildren(toggleProps)
++            toggleProps.source = name
++            toggleProps.entryIndex = entryIndex
++            toggleProps.environmentString = environmentString
++          }
++        case .liveActivity:
++          return renderWithModifiers(LiveActivityToggleView.self, ToggleProps.self) { toggleProps in
++            try updateChildren(toggleProps)
++            toggleProps.source = name
++          }
++        }
++      } else {
++        return renderWithModifiers(ExpoUI.ToggleView.self, ExpoUI.ToggleProps.self, updateProps: updateChildren)
++      }
+     case "react.fragment":
+       return renderWithModifiers(FragmentView.self, FragmentProps.self, updateProps: updateChildren)
+     case "LinkView":

@@ -1,0 +1,70 @@
+diff --git a/node_modules/@expo/ui/build/swift-ui/Toggle/index.js b/node_modules/@expo/ui/build/swift-ui/Toggle/index.js
+index abe370e..5284961 100644
+--- a/node_modules/@expo/ui/build/swift-ui/Toggle/index.js
++++ b/node_modules/@expo/ui/build/swift-ui/Toggle/index.js
+@@ -10,9 +10,8 @@ const ToggleNativeView = requireNativeView('ExpoUI', 'ToggleView');
+         ...restProps,
+         modifiers,
+         ...modifiers ? createViewModifierEventListener(modifiers) : undefined,
+-        onIsOnChange: ({ nativeEvent: { isOn } })=>{
+-            onIsOnChange?.(isOn);
+-        }
++        // expo-widgets uses the returned value as the widget's new props.
++        onIsOnChange: ({ nativeEvent: { isOn } })=>onIsOnChange?.(isOn)
+     };
+     return /*#__PURE__*/ _jsx(ToggleNativeView, {
+         ...baseProps,
+diff --git a/node_modules/@expo/ui/ios/Toggle/ToggleView.swift b/node_modules/@expo/ui/ios/Toggle/ToggleView.swift
+index ac10b9a..9a304f4 100644
+--- a/node_modules/@expo/ui/ios/Toggle/ToggleView.swift
++++ b/node_modules/@expo/ui/ios/Toggle/ToggleView.swift
+@@ -3,24 +3,24 @@
+ import SwiftUI
+ import ExpoModulesCore
+ 
+-internal final class ToggleProps: UIBaseViewProps {
+-  @Field var isOn: Bool?
+-  @Field var label: String?
+-  @Field var systemImage: String?
++open class ToggleProps: UIBaseViewProps {
++  @Field public var isOn: Bool?
++  @Field public var label: String?
++  @Field public var systemImage: String?
+   var onIsOnChange = EventDispatcher()
+ }
+ 
+-internal struct ToggleView: ExpoSwiftUI.View {
+-  @ObservedObject var props: ToggleProps
++public struct ToggleView: ExpoSwiftUI.View {
++  @ObservedObject public var props: ToggleProps
+   // Only used when `isOn` isn't passed. While the prop is set it is the sole source of
+   // truth, so JS stays in control of what the toggle shows and can refuse a change.
+   @State private var uncontrolled = false
+ 
+-  init(props: ToggleProps) {
++  public init(props: ToggleProps) {
+     self.props = props
+   }
+ 
+-  var body: some View {
++  public var body: some View {
+     makeToggle(isOn: Binding(
+       get: { props.isOn ?? uncontrolled },
+       set: { newValue in
+diff --git a/node_modules/@expo/ui/src/swift-ui/Toggle/index.tsx b/node_modules/@expo/ui/src/swift-ui/Toggle/index.tsx
+index 1825680..55e00e5 100644
+--- a/node_modules/@expo/ui/src/swift-ui/Toggle/index.tsx
++++ b/node_modules/@expo/ui/src/swift-ui/Toggle/index.tsx
+@@ -49,9 +49,9 @@ export function Toggle(props: ToggleProps) {
+     ...restProps,
+     modifiers,
+     ...(modifiers ? createViewModifierEventListener(modifiers) : undefined),
+-    onIsOnChange: ({ nativeEvent: { isOn } }: NativeSyntheticEvent<{ isOn: boolean }>) => {
+-      onIsOnChange?.(isOn);
+-    },
++    // expo-widgets uses the returned value as the widget's new props.
++    onIsOnChange: ({ nativeEvent: { isOn } }: NativeSyntheticEvent<{ isOn: boolean }>) =>
++      onIsOnChange?.(isOn),
+   };
+ 
+   return <ToggleNativeView {...baseProps}>{children}</ToggleNativeView>;
