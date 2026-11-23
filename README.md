@@ -1,3 +1,27 @@
+# expo-widgets Toggle repro (`toggle` branch)
+
+Expo SDK 58, `expo-widgets` 58.0.29 and `@expo/ui` 58.0.29 with no patches.
+
+The widget in `widgets/ReproWidget.tsx` shows `enabled: <value>`, an `Enabled` `Toggle` from `@expo/ui/swift-ui`, `count: <value>`, and a `Count` `Button`.
+
+## Steps
+
+1. `npm install`
+2. Set `ios.bundleIdentifier` and `ios.appleTeamId` in `app.json`.
+3. `npx expo run:ios --device --configuration Release`
+4. Open the app once.
+5. Add the Repro Widget to the Home Screen.
+
+Expected: the widget shows the `Enabled` toggle. A tap toggles it, and the widget shows `enabled: true`.
+
+Actual: the toggle is not rendered. The widget shows `enabled: false`, then `count: 0` and the `Count` button. The `Count` button works.
+
+The `toggle-fixed` branch applies the fix to `expo-widgets` and `@expo/ui` with patch-package.
+
+---
+
+The rest of this file is the dynamic enum repro on the `main` branch.
+
 # expo-widgets dynamic enum repro
 
 Expo SDK 58, `expo-widgets` 58.0.29 with no patches.
