@@ -35,10 +35,10 @@ index f063f35..76da786 100644
        const result = findAndCallOnPress(child as Dictionary);
 diff --git a/node_modules/expo-widgets/ios/Widgets/Toggles.swift b/node_modules/expo-widgets/ios/Widgets/Toggles.swift
 new file mode 100644
-index 0000000..b614ef1
+index 0000000..86c18dc
 --- /dev/null
 +++ b/node_modules/expo-widgets/ios/Widgets/Toggles.swift
-@@ -0,0 +1,62 @@
+@@ -0,0 +1,37 @@
 +import SwiftUI
 +import ExpoModulesCore
 +import ExpoUI
@@ -76,54 +76,21 @@ index 0000000..b614ef1
 +    }
 +  }
 +}
-+
-+@available(iOS 17.0, *)
-+struct LiveActivityToggleView: ExpoSwiftUI.View {
-+  @ObservedObject var props: ToggleProps
-+
-+  var body: some View {
-+    SwiftUI.Toggle(
-+      isOn: props.isOn ?? false,
-+      intent: LiveActivityUserInteraction(
-+        source: props.source,
-+        target: props.target
-+      )
-+    ) {
-+      if let label = props.label {
-+        if let systemImage = props.systemImage {
-+          Label(title: { Text(label) }, icon: { Image(systemName: systemImage) })
-+        } else {
-+          Text(label)
-+        }
-+      } else {
-+        Children()
-+      }
-+    }
-+  }
-+}
 diff --git a/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift b/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift
-index 68e376f..a5d2bd2 100644
+index 68e376f..67bddd1 100644
 --- a/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift
 +++ b/node_modules/expo-widgets/ios/Widgets/ViewRenderer.swift
-@@ -77,6 +77,25 @@ struct WidgetsViewRenderer {
+@@ -77,6 +77,17 @@ struct WidgetsViewRenderer {
        } else {
          return renderWithModifiers(ExpoUI.Button.self, ExpoUI.ButtonProps.self, updateProps: updateChildren)
        }
-+    case "ToggleView":
++    case "ToggleView" where kind == .widget:
 +      if #available(iOS 17.0, *) {
-+        switch kind {
-+        case .widget:
-+          return renderWithModifiers(WidgetToggleView.self, ToggleProps.self) { toggleProps in
-+            try updateChildren(toggleProps)
-+            toggleProps.source = name
-+            toggleProps.entryIndex = entryIndex
-+            toggleProps.environmentString = environmentString
-+          }
-+        case .liveActivity:
-+          return renderWithModifiers(LiveActivityToggleView.self, ToggleProps.self) { toggleProps in
-+            try updateChildren(toggleProps)
-+            toggleProps.source = name
-+          }
++        return renderWithModifiers(WidgetToggleView.self, ToggleProps.self) { toggleProps in
++          try updateChildren(toggleProps)
++          toggleProps.source = name
++          toggleProps.entryIndex = entryIndex
++          toggleProps.environmentString = environmentString
 +        }
 +      } else {
 +        return renderWithModifiers(ExpoUI.ToggleView.self, ExpoUI.ToggleProps.self, updateProps: updateChildren)
